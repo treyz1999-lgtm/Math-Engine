@@ -3,7 +3,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
-import geometry as geom
+import geometry_2d as geo_2d
+import geometry_3d as geo_3d
 
 
 
@@ -55,7 +56,7 @@ class Calculator:
         return angle
 
 
-    
+
 
 #Function Class: will hold various functions to calculate expressions
 
