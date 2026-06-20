@@ -21,23 +21,29 @@ import geometry_3d as geo_3d
 #│   ├── solve
 #│   └── limit
 #│
-#Geometry - this will be a file
+#Geometry - this will be a file, 2 files and this is done now
 #│   ├── area
 #│   ├── perimeter
 #│   └── volume
 #│
-#LinearAlgebra - this will be a file
+#│trigonometry -added
+#│  │── basic trig
+#│  │── inverse trig
+#│  │── triangle solvers
+#│  └── right triangle helpers
+#│
+#LinearAlgebra 
 #│   ├── vectors
 #│   ├── matrices
 #│   └── systems
 #│
-#Plotter - make this a separate file
+#Plotter
 #│   ├── function graphs
 #│   ├── geometry plots
 #│   ├── statistical plots
 #│   └── vector plots
 #│
-#Standalone utility functions - incldue in main
+#Standalone utility functions - include in main
 #   ├── arithmetic
 #    ├── trig
 #    └── statistics
