@@ -21,18 +21,18 @@ import geometry_3d as geo_3d
 #│   ├── solve
 #│   └── limit
 #│
-#Geometry - this will be a file, 2 files and this is done now
+#Geometry - done
 #│   ├── area
 #│   ├── perimeter
 #│   └── volume
 #│
-#│trigonometry -added
+#│trigonometry -done
 #│  │── basic trig
 #│  │── inverse trig
 #│  │── triangle solvers
 #│  └── right triangle helpers
 #│
-#LinearAlgebra 
+#LinearAlgebra - done
 #│   ├── vectors
 #│   ├── matrices
 #│   └── systems
@@ -45,15 +45,14 @@ import geometry_3d as geo_3d
 #│
 #Standalone utility functions - include in main
 #   ├── arithmetic
-#    ├── trig
-#    └── statistics
+#   └── statistics
 
 
 #Calculator Class : will hold things like memory, menus, settings, etc
 
 class Calculator:
     def __init__(self):
-        self.history = []
+        self.history = [] #this will be a list of dictionaries that are structured to match whatever JSON objects we want to pass back from the front end
         self.angle_mode = 'degrees' #by default the calculator will accept angles in degrees. Keep in mind that the math library expects radians so internally all the math is done using radians
 
     def convert_angle(self, angle):
