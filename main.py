@@ -43,7 +43,7 @@ import geometry_3d as geo_3d
 #│   ├── statistical plots
 #│   └── vector plots
 #│
-#Standalone utility functions - include in main
+#Standalone utility functions - done
 #   ├── arithmetic
 #   └── statistics
 
