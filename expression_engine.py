@@ -1,8 +1,6 @@
-import math
+
 import sympy as sp
-import numpy as np
 from sympy.calculus.util import continuous_domain
-from sympy.core import evalf
 from sympy.parsing.sympy_parser import (
     parse_expr,
     standard_transformations,
@@ -714,6 +712,57 @@ def function_intercepts(expr: str):
     }
 
 def critical_points(expr, variable):
+    """
+       Determine the critical points of a single-variable function.
+
+       A critical point occurs where the first derivative of a function
+       equals zero. This function computes the first derivative, solves
+       for all x-values where f'(x) = 0, and returns the corresponding
+       coordinate points on the original function.
+
+       Note:
+           This implementation only identifies critical points where
+           the derivative equals zero. It does not currently detect
+           points where the derivative is undefined.
+
+       Examples:
+           expr = "x^2 - 4*x + 3"
+           variable = "x"
+
+           Derivative:
+               2*x - 4
+
+           Critical point:
+               x = 2
+
+           Returns:
+               [(2, -1)]
+
+       Args:
+           expr (str):
+               Mathematical expression entered by the user.
+
+               Example:
+                   "x^2 - 4*x + 3"
+                   "sin(x)"
+                   "x^3 - 3*x"
+
+           variable (str):
+               Variable to differentiate with respect to.
+
+       Returns:
+           list[tuple]:
+               List of coordinate tuples representing critical points.
+
+               Example:
+                   [(2, -1)]
+                   [(0, 0), (2, 4)]
+
+       Raises:
+           ValueError:
+               Raised if the expression does not contain the
+               specified variable.
+       """
     expression = to_sympy(expr)
     variable = sp.Symbol(variable)
     if variable not in expression.free_symbols:
@@ -729,8 +778,194 @@ def critical_points(expr, variable):
 
     return coordinates
 
-def local_extrema(expr):
-    pass
+def local_extrema(expr : str, variable : str):
+    """
+        Determine the local extrema of a single-variable function using
+        the second derivative test.
 
-def inflection_points(expr):
-    pass
+        The function first finds all critical points of the expression,
+        then computes the second derivative and evaluates it at each
+        critical x-value to classify the point as:
+
+        - Local minimum if f''(x) > 0
+        - Local maximum if f''(x) < 0
+        - Inconclusive if f''(x) = 0
+
+        Note:
+            This implementation assumes real-valued functions and only
+            analyzes critical points where the first derivative equals zero.
+            It does not currently detect extrema at points where the
+            derivative is undefined.
+
+        Examples:
+            expr = "x^2 - 4*x + 3"
+            variable = "x"
+
+            Critical point:
+                (2, -1)
+
+            Second derivative:
+                2
+
+            Since 2 > 0:
+                Local minimum
+
+            Returns:
+                [(2, -1, "minimum")]
+
+        Args:
+            expr (str):
+                Mathematical expression entered by the user.
+
+                Example:
+                    "x^2 - 4*x + 3"
+                    "x^3 - 3*x"
+                    "sin(x)"
+
+            variable (str):
+                Variable used for differentiation.
+
+        Returns:
+            list[tuple]:
+                List of tuples containing:
+                    (x-coordinate, y-coordinate, classification)
+
+                Classification will be one of:
+                    "minimum"
+                    "maximum"
+                    "inconclusive"
+
+                Example:
+                    [
+                        (-1, 2, "maximum"),
+                        (1, -2, "minimum")
+                    ]
+
+        Raises:
+            ValueError:
+                Raised if the expression does not contain the
+                specified variable.
+        """
+    expression = to_sympy(expr)
+    variable = sp.Symbol(variable)
+
+    second_derivative = sp.diff(expression, variable, 2)
+    points = critical_points(expr, str(variable))
+
+    extrema = []
+
+    for x_val, y_val in points:
+
+        second_value = second_derivative.subs(variable, x_val)
+
+        if second_value > 0:
+            extrema.append((x_val, y_val, "local minimum"))
+        elif second_value < 0:
+            extrema.append((x_val, y_val, "local maximum"))
+        else:
+            extrema.append((x_val, y_val, "inconclusive"))
+
+    return extrema
+
+def inflection_points(expr: str,variable: str,epsilon: float | None = None):
+    """
+      Determine the inflection points of a single-variable function.
+
+      An inflection point occurs where the function changes concavity,
+      meaning the second derivative changes sign from positive to negative
+      or from negative to positive.
+
+      This function:
+      1. Computes the second derivative of the expression
+      2. Solves for candidate points where f''(x) = 0
+      3. Tests a small distance to the left and right of each candidate
+         to determine whether the second derivative changes sign
+      4. Returns the coordinates of all confirmed inflection points
+
+      The sign-change test uses a small epsilon value to sample nearby
+      points around each candidate.
+
+      Examples:
+          expr = "x^3"
+          variable = "x"
+
+          Second derivative:
+              6*x
+
+          Candidate:
+              x = 0
+
+          Left side (x = -0.1):
+              negative
+
+          Right side (x = 0.1):
+              positive
+
+          Since the sign changes:
+              (0, 0) is an inflection point
+
+          Returns:
+              [(0, 0)]
+
+      Args:
+          expr (str):
+              Mathematical expression entered by the user.
+
+              Example:
+                  "x^3"
+                  "x^4"
+                  "sin(x)"
+
+          variable (str):
+              Variable used for differentiation.
+
+          epsilon (float | None):
+              Small positive value used to sample points to the
+              left and right of each candidate inflection point.
+
+              Defaults to 0.1 if not provided.
+
+      Returns:
+          list[tuple]:
+              List of coordinate tuples representing inflection points.
+
+              Example:
+                  [(0, 0)]
+                  [(-2, 5), (3, -1)]
+
+      Raises:
+          ValueError:
+              Raised if epsilon is not numeric or is less than
+              or equal to zero.
+      """
+    expression = to_sympy(expr)
+    variable = sp.Symbol(variable)
+
+    if epsilon is None:
+        epsilon = 0.1
+
+    try:
+        epsilon = float(epsilon)
+    except:
+        raise ValueError("epsilon must be numeric")
+
+    if epsilon <= 0:
+        raise ValueError("epsilon must be greater than 0")
+
+    if epsilon <= 0:
+        raise ValueError("epsilon must be greater than 0")
+
+    points = []
+    second_derivative = sp.diff(expression, variable, 2)
+    candidates = sp.solve(second_derivative, variable)
+
+    for candidate in candidates:
+        if candidate.is_real:
+            left = second_derivative.subs(variable, candidate - epsilon)
+            right = second_derivative.subs(variable, candidate + epsilon)
+
+            if left * right < 0:
+                y_value = expression.subs(variable, candidate)
+                points.append((candidate, y_value))
+
+    return points
