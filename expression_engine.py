@@ -1,6 +1,7 @@
 import math
 import sympy as sp
 import numpy as np
+from sympy.calculus.util import continuous_domain
 from sympy.core import evalf
 from sympy.parsing.sympy_parser import (
     parse_expr,
@@ -429,6 +430,56 @@ def derivative(expression: str, variable: str, order: int):
 
 
 def integral(expression: str, variable: str, a=None, b=None):
+    """
+       Compute the symbolic or definite integral of an expression.
+
+       The function converts a user-provided mathematical expression into a
+       SymPy expression and computes either:
+
+       - An indefinite integral if no bounds are provided
+       - A definite integral if both lower and upper bounds are provided
+
+       Examples:
+           Indefinite integral:
+               expression = "x^2"
+               variable = "x"
+
+               Returns:
+                   x**3 / 3
+
+           Definite integral:
+               expression = "x^2"
+               variable = "x"
+               a = 0
+               b = 3
+
+               Returns:
+                   9
+
+       Args:
+           expression (str):
+               Mathematical expression entered by the user.
+
+           variable (str):
+               Variable to integrate with respect to.
+
+           a (int | float | str | None):
+               Lower bound of integration.
+               If None, the integral is treated as indefinite.
+
+           b (int | float | str | None):
+               Upper bound of integration.
+               Must be provided together with a for definite integrals.
+
+       Returns:
+           SymPy expression object | numeric value:
+               - Returns a symbolic expression for indefinite integrals
+               - Returns a numeric or symbolic result for definite integrals
+
+       Raises:
+           ValueError:
+               Raised if only one bound is provided.
+       """
     expression = to_sympy(expression)
     variable = sp.Symbol(variable)
 
@@ -446,33 +497,237 @@ def integral(expression: str, variable: str, a=None, b=None):
     return sp.integrate(expression, (variable, a, b))
 
 
-
-def polynomial_degree(coefficients):
-    pass
-
-
-
-
-
-
-
-
-
-
 def limit(expr, variable, value):
-    pass
+    """
+        Compute the limit of an expression as a variable approaches a given value.
 
+        The function converts a user-provided mathematical expression into a
+        SymPy expression and evaluates its limit with respect to the chosen variable.
+
+        Examples:
+            expr = "sin(x)/x"
+            variable = "x"
+            value = 0
+
+            Returns:
+                1
+
+            expr = "1/x"
+            variable = "x"
+            value = "oo"
+
+            Returns:
+                0
+
+        Args:
+            expr (str):
+                Mathematical expression entered by the user.
+
+            variable (str):
+                Variable approaching the specified value.
+
+            value (int | float | str):
+                Value that the variable approaches.
+
+                Examples:
+                    0
+                    2
+                    "pi"
+                    "oo"   (positive infinity)
+                    "-oo"  (negative infinity)
+
+        Returns:
+            SymPy expression object | numeric value:
+                Result of the evaluated limit.
+
+        Raises:
+            ValueError:
+                Raised if the expression or limit value cannot be parsed.
+        """
+    expression = to_sympy(expr)
+    symbol = sp.Symbol(variable)
+    value = to_sympy(str(value))
+    return sp.limit(expression, symbol, value)
 
 
 #Function analysis
-def function_domain(expr):
-    pass
+def function_domain(expr: str, variable: str, math_set=None):
+    """
+       Determine the domain of a mathematical function over a specified set.
 
-def function_intercepts(expr):
-    pass
+       The function converts a user-provided mathematical expression into a
+       SymPy expression and determines where the function is defined and
+       continuous with respect to the chosen variable.
 
-def critical_points(expr):
-    pass
+       If no mathematical set is provided, the function defaults to the
+       real numbers.
+
+       Examples:
+           expr = "1/x"
+           variable = "x"
+           math_set = "Reals"
+
+           Returns:
+               Union(Interval.open(-oo, 0), Interval.open(0, oo))
+
+           expr = "sqrt(x)"
+           variable = "x"
+
+           Returns:
+               Interval(0, oo)
+
+       Args:
+           expr (str):
+               Mathematical expression entered by the user.
+
+           variable (str):
+               Variable to analyze the domain with respect to.
+
+           math_set (str | None):
+               Mathematical set used as the search space.
+
+               Supported sets:
+                   "Reals"
+                   "Complexes"
+                   "Integers"
+                   "Naturals"
+                   "Naturals0"
+
+               Defaults to Reals if not provided.
+
+       Returns:
+           SymPy set object:
+               Domain where the function is defined and continuous.
+
+       Raises:
+           ValueError:
+               Raised if an unsupported mathematical set is provided.
+       """
+    expression = to_sympy(expr)
+    variable = sp.Symbol(variable)
+
+    allowed_sets = {
+        "reals": sp.S.Reals,
+        "complexes": sp.S.Complexes,
+        "integers": sp.S.Integers,
+        "naturals": sp.S.Naturals,
+        "naturals0": sp.S.Naturals0
+    }
+
+    if math_set is None:
+        domain_set = sp.S.Reals
+    else:
+        math_set = math_set.lower().strip()
+
+        if math_set not in allowed_sets:
+            raise ValueError(
+                f"Math set must be one of: {tuple(allowed_sets.keys())}"
+            )
+
+        domain_set = allowed_sets[math_set]
+
+    return continuous_domain(expression, variable, domain_set)
+
+
+def function_intercepts(expr: str):
+    """
+       Determine the x-intercepts and y-intercept of a single-variable function.
+
+       The function converts a user-provided mathematical expression into a
+       SymPy expression, automatically detects its variable, and computes:
+
+       - x-intercepts by solving f(x) = 0
+       - y-intercept by evaluating the function at x = 0
+
+       The expression must contain exactly one variable.
+
+       Examples:
+           expr = "x^2 - 4*x + 3"
+
+           Returns:
+               {
+                   "x_intercepts": [(1, 0), (3, 0)],
+                   "y_intercept": (0, 3)
+               }
+
+           expr = "t^2 - 9"
+
+           Returns:
+               {
+                   "x_intercepts": [(-3, 0), (3, 0)],
+                   "y_intercept": (0, -9)
+               }
+
+       Args:
+           expr (str):
+               Mathematical expression entered by the user.
+
+               Example:
+                   "x^2 - 4*x + 3"
+                   "sin(t)"
+                   "1/x"
+
+       Returns:
+           dict:
+               Dictionary containing the x-intercepts and y-intercept.
+
+               Structure:
+                   {
+                       "x_intercepts": list[tuple],
+                       "y_intercept": tuple
+                   }
+
+       Raises:
+           ValueError:
+               Raised if the expression contains zero or multiple variables.
+
+           ZeroDivisionError:
+               Raised if the function is undefined at x = 0,
+               meaning no y-intercept exists.
+       """
+    expression = to_sympy(expr)
+
+    variables = expression.free_symbols
+
+    if len(variables) != 1:
+        raise ValueError(
+            "Expression must contain exactly one variable"
+        )
+
+    variable = next(iter(variables))
+
+    y_value = expression.subs(variable, 0)
+
+    if not y_value.is_finite:
+        raise ValueError(
+            "Function is undefined at 0, no y-intercept exists"
+        )
+
+    y_intercept = (0, y_value)
+
+    x_values = sp.solve(expression, variable)
+    x_intercepts = [(value, 0) for value in x_values]
+
+    return {
+        "x_intercepts": x_intercepts,
+        "y_intercept": y_intercept
+    }
+
+def critical_points(expr, variable):
+    expression = to_sympy(expr)
+    variable = sp.Symbol(variable)
+    if variable not in expression.free_symbols:
+        raise ValueError(
+            "Expression must contain the specified variable"
+        )
+    prime = sp.diff(expression, variable )
+    crit_points = sp.solve(prime, variable)
+    coordinates = [
+        (x_val, expression.subs(variable, x_val))
+        for x_val in crit_points
+    ]
+
+    return coordinates
 
 def local_extrema(expr):
     pass
