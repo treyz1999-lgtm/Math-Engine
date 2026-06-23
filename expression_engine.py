@@ -279,40 +279,185 @@ def solve_quadratic(a: float, b: float, c: float):
     expression = a*x**2 + b*x + c
     return sp.solve(expression, x)
 
-def solve_equation(lhs, rhs, variable):
-    pass
+def solve_equation(lhs: str, rhs: str, variable: str):
+    """
+       Solve a system of equations for one or more variables.
 
-def solve_system(equations, variables):
-    pass
+       Each equation should be provided as a string expression already
+       rearranged into standard form where the equation equals zero.
+
+       Example system:
+           x + y = 5
+           x - y = 1
+
+       Should be passed as:
+           equations = ["x + y - 5", "x - y - 1"]
+           variables = ["x", "y"]
+
+       The function converts each equation into a SymPy expression,
+       converts each variable name into a SymPy Symbol, and uses
+       SymPy's solve() method to solve the system.
+
+       Args:
+           equations (list):
+               List of equation strings in standard form.
+
+           variables (list):
+               List of variable names to solve for.
+
+       Returns:
+           list[dict]:
+               List of solution dictionaries mapping variables to values.
+
+               Example:
+                   [{x: 3, y: 2}]
+
+               Multiple solutions may return multiple dictionaries:
+                   [
+                       {x: 1, y: 2},
+                       {x: -1, y: 2}
+                   ]
+
+               No solutions return:
+                   []
+
+       Raises:
+           ValueError:
+               Raised if an equation cannot be parsed.
+       """
+    lhs = to_sympy(lhs)
+    rhs = to_sympy(rhs)
+    variable = sp.Symbol(variable)
+    if variable not in lhs.free_symbols.union(rhs.free_symbols):
+        raise ValueError(f"Variable '{variable}' not found in equation")
+
+    equation = lhs - rhs
+
+    return sp.solve(equation, variable)
+
+def solve_system(equations : list[str], variables : list[str]):
+    equations = [to_sympy(eq) for eq in equations]
+
+    variables = [sp.Symbol(var) for var in variables]
+
+    solutions = sp.solve(equations, variables, dict=True)
+    return solutions
+
 
 
 #Polynomials
-def find_roots(coefficients):
-    pass
+def find_roots(expression: str, variable: str):
+    """
+        Find the roots (zeros) of a polynomial or symbolic expression.
 
-def polynomial_derivative(coefficients):
-    pass
+        A root is a value of the chosen variable that makes the
+        expression equal to zero.
 
-def polynomial_integral(coefficients):
-    pass
+        Example:
+            x^2 - 5x + 6 = 0
+
+            Returns:
+                [2, 3]
+
+        Args:
+            expression (str):
+                Mathematical expression entered by the user.
+
+            variable (str):
+                Variable to solve for.
+
+        Returns:
+            list:
+                List of roots (real or complex).
+
+                Examples:
+                    [5]
+                    [2, 3]
+                    [-I, I]
+        """
+    expression = to_sympy(expression)
+    variable = sp.Symbol(variable)
+
+    return sp.solve(expression, variable)
+
+def derivative(expression: str, variable: str, order: int):
+    """
+        Compute the symbolic derivative of an expression with respect to a chosen variable.
+
+        The function converts a user-provided mathematical expression into a
+        SymPy expression and computes its derivative using SymPy's diff() method.
+        Higher-order derivatives are supported by specifying the derivative order.
+
+        Examples:
+            expression = "x^3 + 2*x"
+            variable = "x"
+            order = 1
+
+            Returns:
+                3*x**2 + 2
+
+            expression = "x^3"
+            variable = "x"
+            order = 2
+
+            Returns:
+                6*x
+
+        Args:
+            expression (str):
+                Mathematical expression entered by the user.
+
+            variable (str):
+                Variable to differentiate with respect to.
+
+            order (int):
+                Order of the derivative.
+                Example:
+                    1 -> first derivative
+                    2 -> second derivative
+                    3 -> third derivative
+
+        Returns:
+            SymPy expression object:
+                Symbolic derivative of the expression.
+        """
+    if order < 1:
+        raise ValueError("Derivative order must be at least 1")
+    expression = to_sympy(expression)
+    variable = sp.Symbol(variable)
+    return sp.diff(expression, variable, order)
+
+
+def integral(expression: str, variable: str, a=None, b=None):
+    expression = to_sympy(expression)
+    variable = sp.Symbol(variable)
+
+    # Indefinite integral
+    if a is None and b is None:
+        return sp.integrate(expression, variable)
+
+    # Require both bounds for definite integral
+    if a is None or b is None:
+        raise ValueError("Both lower and upper bounds are required")
+
+    a = to_sympy(str(a))
+    b = to_sympy(str(b))
+
+    return sp.integrate(expression, (variable, a, b))
+
+
 
 def polynomial_degree(coefficients):
     pass
 
 
 
-#Calculus
-def derivative(expr, variable):
-    pass
 
-def nth_derivative(expr, variable, n):
-    pass
 
-def integral(expr, variable):
-    pass
 
-def definite_integral(expr, variable, a, b):
-    pass
+
+
+
 
 def limit(expr, variable, value):
     pass
