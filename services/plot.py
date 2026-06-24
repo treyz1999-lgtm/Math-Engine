@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sy
-from expression_engine import to_sympy, critical_points, local_extrema, inflection_points
-from stats import to_array, validate_array
+from services.expression_engine import (to_sympy, critical_points, local_extrema, inflection_points)
+from services.stats import (to_array, validate_array)
 
 
 #plot.py
