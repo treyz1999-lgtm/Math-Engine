@@ -1,80 +1,107 @@
 import math
 import numpy as np
 
-#HELPERS
-def to_vector(v):
+
+# HELPERS
+
+def to_vector(v) -> np.ndarray:
+    """Convert input into a NumPy float vector."""
     return np.array(v, dtype=float)
 
-def to_matrix(m):
+
+def to_matrix(m) -> np.ndarray:
+    """Convert input into a NumPy float matrix."""
     return np.array(m, dtype=float)
 
-def validate_vector(v1, v2):
-    if v1.shape != v2.shape:
-        raise TypeError("vector must have the same shape")
 
-# VECTOR
-def vector_add(v1, v2):
+def validate_shapes(a, b):
+    """Validate that two vectors/matrices have matching shapes."""
+    if a.shape != b.shape:
+        raise ValueError("Inputs must have the same shape")
+
+
+# VECTOR OPERATIONS
+
+def vector_add(v1, v2) -> list:
     v1 = to_vector(v1)
     v2 = to_vector(v2)
-    validate_vector(v1, v2)
+    validate_shapes(v1, v2)
     return np.add(v1, v2).tolist()
 
-def vector_subtract(v1, v2):
+
+def vector_subtract(v1, v2) -> list:
     v1 = to_vector(v1)
     v2 = to_vector(v2)
-    validate_vector(v1, v2)
+    validate_shapes(v1, v2)
     return np.subtract(v1, v2).tolist()
 
 
-def vector_magnitude(v1, v2): #this will only support 1d vectors for the purposes of this project. Later implementations might allow for multidimensional arrays
+def vector_magnitude(v) -> float:
+    """
+    Return the magnitude (Euclidean norm) of a vector.
 
-    return math.sqrt(v1**2 + v2**2)
+    Example:
+        [3, 4] -> 5
+    """
+    v = to_vector(v)
+    return float(np.linalg.norm(v))
 
-def vector_dot_product(v1, v2):
+
+def vector_dot_product(v1, v2) -> float:
     v1 = to_vector(v1)
     v2 = to_vector(v2)
-    return np.dot(v1, v2).tolist()
+    validate_shapes(v1, v2)
+    return float(np.dot(v1, v2))
 
-def vector_cross_product(v1, v2):
+
+def vector_cross_product(v1, v2) -> list:
     v1 = to_vector(v1)
     v2 = to_vector(v2)
     return np.cross(v1, v2).tolist()
 
-def vector_scalar_multiply(v1, scalar):
-    v1 = to_vector(v1)
-    v1 *= scalar
-    return v1
+
+def vector_scalar_multiply(v, scalar) -> list:
+    v = to_vector(v)
+    return np.multiply(v, scalar).tolist()
 
 
-def vector_unit(v1):
-    v1 = to_vector(v1)
-    return v1/np.linalg.norm(v1)
+def vector_unit(v) -> list:
+    v = to_vector(v)
+
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        raise ValueError("Zero vector has no unit vector")
+
+    return (v / norm).tolist()
 
 
-# MATRIX
-def matrix_add(m1, m2):
+# MATRIX OPERATIONS
+
+def matrix_add(m1, m2) -> list:
     m1 = to_matrix(m1)
     m2 = to_matrix(m2)
-    validate_vector(m1, m2)
+    validate_shapes(m1, m2)
     return np.add(m1, m2).tolist()
 
-def matrix_subtract(m1, m2):
+
+def matrix_subtract(m1, m2) -> list:
     m1 = to_matrix(m1)
     m2 = to_matrix(m2)
-    validate_vector(m1, m2)
+    validate_shapes(m1, m2)
     return np.subtract(m1, m2).tolist()
 
 
-def matrix_scalar_multiply(m1, scalar):
-    m1 = to_matrix(m1)
-    return np.multiply(m1, scalar).tolist()
+def matrix_scalar_multiply(m, scalar) -> list:
+    m = to_matrix(m)
+    return np.multiply(m, scalar).tolist()
 
 
-def matrix_transpose(m):
+def matrix_transpose(m) -> list:
+    m = to_matrix(m)
     return np.transpose(m).tolist()
 
 
-def matrix_multiply(m1, m2):
+def matrix_multiply(m1, m2) -> list:
     m1 = to_matrix(m1)
     m2 = to_matrix(m2)
     return np.matmul(m1, m2).tolist()
@@ -82,30 +109,60 @@ def matrix_multiply(m1, m2):
 
 
 # MATRIX PROPERTIES
-def matrix_determinant(m):
+
+def matrix_determinant(m) -> float:
     m = to_matrix(m)
-    return np.linalg.det(m)
+    return float(np.linalg.det(m))
 
-def matrix_inverse(m):
+
+def matrix_inverse(m) -> list:
+    """
+    Return the inverse of a square matrix.
+
+    Raises:
+        ValueError if matrix is singular.
+    """
     m = to_matrix(m)
-    return np.linalg.inv(m)
+
+    try:
+        return np.linalg.inv(m).tolist()
+    except np.linalg.LinAlgError:
+        raise ValueError("Matrix is singular and cannot be inverted")
 
 
-def matrix_trace(m):
+def matrix_trace(m) -> float:
     m = to_matrix(m)
-    return np.trace(m)
+    return float(np.trace(m))
 
 
-def matrix_rank(m):
+def matrix_rank(m) -> int:
     m = to_matrix(m)
-    return np.linalg.matrix_rank(m)
+    return int(np.linalg.matrix_rank(m))
 
 
 
-# SYSTEMS
-def solve_linear_system(a, b):
+# LINEAR SYSTEMS
+
+def solve_linear_system(a, b) -> list:
+    """
+    Solve Ax = b for x.
+
+    Args:
+        a:
+            Square coefficient matrix
+        b:
+            Constant vector
+
+    Returns:
+        Solution vector
+
+    Raises:
+        ValueError:
+            If matrix is not square or system has no unique solution.
+    """
     a = to_matrix(a)
-    b = to_matrix(b)
+    b = to_vector(b)
+
     if a.shape[0] != a.shape[1]:
         raise ValueError("Coefficient matrix must be square")
 
@@ -120,24 +177,39 @@ def solve_linear_system(a, b):
     return solution.tolist()
 
 
-#Matrix Properties
-def matrix_eigenvalues(m):# numpy has a method .linalg.eig() that will return eigenvalues and eigenvectors, but we will do each separately
+
+# ADVANCED MATRIX OPS
+
+def matrix_eigenvalues(m) -> list:
+    """
+    Return eigenvalues of a matrix.
+    """
     m = to_matrix(m)
-    return np.linalg.eigvals(m)
+    return np.linalg.eigvals(m).tolist()
 
-def matrix_eigenvectors(m):# we might later just use 1 function to return both, but this allows for the user to get just the information they want. The downside being you would need to run the computation twice to get both
+
+def matrix_eigenvectors(m) -> list:
+    """
+    Return eigenvectors of a matrix.
+    """
     m = to_matrix(m)
-    eigenvalues, eigenvectors = np.linalg.eig(m)
-    return eigenvectors
+    _, eigenvectors = np.linalg.eig(m)
+    return eigenvectors.tolist()
 
 
-def matrix_svd(m):#this doesn't really belong in a 'calculator' most people will never know or use this
+def matrix_svd(m) -> dict:
+    """
+    Compute Singular Value Decomposition.
+
+    Decomposes matrix A into:
+
+        A = U * S * Vᵀ
+    """
     m = to_matrix(m)
     u, s, vt = np.linalg.svd(m)
-    return {
-        'U' : u.tolist(),
-        'S' : s.tolist(),
-        'Vt' : vt.tolist()
-    }
 
-#def matrix_projection(v, onto):
+    return {
+        "U": u.tolist(),
+        "S": s.tolist(),
+        "Vt": vt.tolist()
+    }
