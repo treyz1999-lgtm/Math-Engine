@@ -288,6 +288,43 @@ def plot_scatterplot(x_data: list, y_data: list, settings: dict):
 
     plt.show()
 
+def plot_vectors(vector_list: list, settings: dict):
+    """
+    Plot 2D vectors from the origin.
+
+    Args:
+        vector_list:
+            List of coordinate pairs representing vectors.
+
+            Example:
+                [(3, 4), (1, 2), (-2, 5)]
+
+        settings:
+            Calculator settings dictionary containing plot settings.
+    """
+    color = settings["plot"]["color"]
+
+    for vector in vector_list:
+        if len(vector) != 2:
+            raise ValueError(
+                "Each vector must contain exactly 2 coordinates (x, y)"
+            )
+
+        x = float(vector[0])
+        y = float(vector[1])
+
+        plt.quiver(0, 0, x, y, color=color)
+
+    plt.axhline(0)
+    plt.axvline(0)
+    plt.gca().set_aspect("equal")
+
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Vector Plot")
+
+    plt.show()
+
 
 if __name__ == "__main__": #this is for testing purposes
     test_settings = {
@@ -309,3 +346,4 @@ plot_extrema("x^3-3x", "x", test_settings)
 
 #Future feature:
 #- optional geometry visualization
+#- more linear algebra plots or system of equations plotting
