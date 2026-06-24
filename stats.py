@@ -2,11 +2,6 @@ import math
 
 import numpy as np
 import statistics
-import itertools
-
-import scipy
-from scipy import stats
-
 from scipy import stats
 
 
@@ -91,9 +86,10 @@ def stats_covariance(x, y):
 
 
 def stats_correlation(x, y, ): #depending on the distribution we would want to use a different method, pearsonr will handle normal distributions
-    coefficient, p_value = stats.pearsonr(x, y)
     if len(x) != len(y):
         raise ValueError("Arrays must have same length")
+
+    coefficient, p_value = stats.pearsonr(x, y)
     return {
         'coefficient': coefficient,
         'p_value': p_value,
@@ -102,13 +98,15 @@ def stats_correlation(x, y, ): #depending on the distribution we would want to u
 
 
 #Others
-def stats_permutations(n, r):
-    validate_array(n)
+def stats_permutations(n: int, r: int):
+    if n < 0 or r < 0:
+        raise ValueError(...)
     return math.perm(n, r)
 
 
 def stats_combinations(n, r):
-    validate_array(n)
+    if n < 0 or r < 0:
+        raise ValueError(...)
     return math.comb(n, r)
 
 

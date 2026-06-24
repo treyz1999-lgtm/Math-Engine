@@ -14,7 +14,7 @@ import geometry_3d as geo_3d
 #├── history
 #├── menus
 #│
-#Function -this will be a file
+#expressions -done
 #│   ├── evaluate
 #│   ├── derivative
 #│   ├── integral
@@ -48,7 +48,31 @@ import geometry_3d as geo_3d
 #   └── statistics
 
 
-#Calculator Class : will hold things like memory, menus, settings, etc
+#settings
+#├── global calculator settings
+#└── feature-specific settings
+#    └── plot settings
+
+settings = {
+    "angle_mode": "degrees",
+    "precision": 4,
+    "plot": {
+        "linewidth": 2,
+        "color": "blue",
+        "grid": True,
+        "points": 500,
+        'x_min': -10,
+        'x_max': 10,
+        "bins": 20,
+        "alpha": 0.7,
+        'marker': 'o',
+        "markersize": 5,
+
+    },
+    "calculus": {
+        "epsilon": 0.1
+    },
+}
 
 class Calculator:
     def __init__(self):
@@ -61,25 +85,6 @@ class Calculator:
         return angle
 
 
-
-
-#Function Class: will hold various functions to calculate expressions
-
-#Geometry Class: will hold all the geometric calculations we might want
-
-
-
-
-
-#Trigonometry Class: same as geometry but with Trig instead, that might end up as 1 class in the end
-
-#LinearAlgebra Class: will hold the linear algebra functions
-
-#Plotter Class: will hold all the plotting functions
-
-#Conversions Class: this might hold some basic conversions like kg to lbs, etc
-
-#Stand-alone functions: this is where we would put anything that doesn't fall into a class like basic arithmetic and maybe stats
 
 
 

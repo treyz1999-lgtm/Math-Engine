@@ -867,7 +867,7 @@ def local_extrema(expr : str, variable : str):
 
     return extrema
 
-def inflection_points(expr: str,variable: str,epsilon: float | None = None):
+def inflection_points(expr: str,variable: str,epsilon: float):
     """
       Determine the inflection points of a single-variable function.
 
@@ -919,11 +919,14 @@ def inflection_points(expr: str,variable: str,epsilon: float | None = None):
           variable (str):
               Variable used for differentiation.
 
-          epsilon (float | None):
-              Small positive value used to sample points to the
-              left and right of each candidate inflection point.
+          epsilon (float):
+                Small positive value used to sample points to the
+                left and right of each candidate inflection point.
 
-              Defaults to 0.1 if not provided.
+                This value is typically provided by the calculator's
+                persistent settings.
+
+                epsilon is controlled by calculator settings and injected by backend
 
       Returns:
           list[tuple]:
@@ -941,16 +944,11 @@ def inflection_points(expr: str,variable: str,epsilon: float | None = None):
     expression = to_sympy(expr)
     variable = sp.Symbol(variable)
 
-    if epsilon is None:
-        epsilon = 0.1
 
     try:
         epsilon = float(epsilon)
     except:
         raise ValueError("epsilon must be numeric")
-
-    if epsilon <= 0:
-        raise ValueError("epsilon must be greater than 0")
 
     if epsilon <= 0:
         raise ValueError("epsilon must be greater than 0")
