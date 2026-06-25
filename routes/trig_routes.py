@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 import state
 from services import trig
-from utils.api_helpers import resolve_operation, safe_execute
+from utils.api_helpers import resolve_operation, safe_execute, execute_and_log
 
 router = APIRouter(
     prefix="/trig",
@@ -10,7 +10,6 @@ router = APIRouter(
 )
 
 #FUNCTION MAPS
-
 BASIC_TRIG_FUNCTIONS = {
     "sin": trig.trig_sin,
     "cos": trig.trig_cos,
@@ -45,11 +44,9 @@ UNIT_CIRCLE_FUNCTIONS = {
 }
 
 # REQUEST MODELS
-
 class BasicTrigRequest(BaseModel):
     operation: str
     value: float  # angle for basic trig, ratio/value for inverse trig
-
 
 class LawOfSinesTrigRequest(BaseModel):
     operation: str
@@ -57,13 +54,11 @@ class LawOfSinesTrigRequest(BaseModel):
     known_angle: float
     target_value: float
 
-
 class LawOfCosinesTrigRequest(BaseModel):
     operation: str
     side1: float
     side2: float
     value3: float  # either angle or side
-
 
 class TriangleHelperRequest(BaseModel):
     operation: str
@@ -75,86 +70,51 @@ class UnitCircleRequest(BaseModel):
     angle: float
 
 # ROUTES
-
 @router.post("/basic")
-def basic_trig_endpoint(request: BasicTrigRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+def basic_trig_endpoint(request: BasicTrigRequest):
+    _, result = execute_and_log(
+        "/trig/basic",
+        request,
         BASIC_TRIG_FUNCTIONS,
-        "trig"
-    )
-
-    result = safe_execute(
-        func,
+        "Trig",
         request.value,
         state.settings
     )
-
-    state.add_to_history(
-        endpoint="/trig/basic",
-        request_data=request.model_dump(),
-        display_name=f"Trig: {operation}",
-        output=result
-    )
-
     return {"result": result}
 
 @router.post("/law-of-sines")
-def law_of_sines_endpoint(request: LawOfSinesTrigRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+def law_of_sines_endpoint(request: LawOfSinesTrigRequest):
+    _, result = execute_and_log(
+        "/trig/law-of-sines",
+        request,
         LAW_OF_SINES_FUNCTIONS,
-        "law-of-sines"
-    )
-
-    result = safe_execute(
-        func,
+        "Law of Sines",
         request.known_side,
         request.known_angle,
         request.target_value,
         state.settings
     )
-
-    state.add_to_history(
-        endpoint="/trig/law-of-sines",
-        request_data=request.model_dump(),
-        display_name=f"Law of Sines: {operation}",
-        output=result
-    )
-
     return {"result": result}
 
 @router.post("/law-of-cosines")
-def law_of_cosines_endpoint(request: LawOfCosinesTrigRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+def law_of_cosines_endpoint(request: LawOfCosinesTrigRequest):
+    _, result = execute_and_log(
+        "/trig/law-of-cosines",
+        request,
         LAW_OF_COSINES_FUNCTIONS,
-        "law-of-cosines"
-    )
-
-    result = safe_execute(
-        func,
+        "Law of Cosines",
         request.side1,
         request.side2,
         request.value3,
         state.settings
     )
-
-    state.add_to_history(
-        endpoint="/trig/law-of-cosines",
-        request_data=request.model_dump(),
-        display_name=f"Law of Cosines: {operation}",
-        output=result
-    )
-
     return {"result": result}
 
 @router.post("/triangle-helpers")
-def triangle_helper_endpoint(request: TriangleHelperRequest) -> dict:
+def triangle_helper_endpoint(request: TriangleHelperRequest):
     operation, func = resolve_operation(
         request.operation,
-        TRIANGLE_HELPER_FUNCTIONS,
-        "triangle-helper"
+        TRIANGLE_HELPER_FUNCTIONS
     )
 
     if operation == "third_angle":
@@ -177,25 +137,16 @@ def triangle_helper_endpoint(request: TriangleHelperRequest) -> dict:
         display_name=f"Triangle Helper: {operation}",
         output=result
     )
-
     return {"result": result}
 
-@router.post('/unit-circle')
-def unit_circle_endpoint(request: UnitCircleRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+@router.post("/unit-circle")
+def unit_circle_endpoint(request: UnitCircleRequest):
+    _, result = execute_and_log(
+        "/trig/unit-circle",
+        request,
         UNIT_CIRCLE_FUNCTIONS,
-        'unit-circle'
-    )
-    result = safe_execute(
-        func,
+        "Unit Circle",
         request.angle,
         state.settings
-    )
-    state.add_to_history(
-        endpoint="/trig/unit-circle",
-        request_data=request.model_dump(),
-        display_name=f"Find Unit-Circle: {operation}",
-        output=result
     )
     return {"result": result}

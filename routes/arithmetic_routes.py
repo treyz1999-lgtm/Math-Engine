@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-import state
 from services import arithmetic
-from utils.api_helpers import resolve_operation, safe_execute
+from utils.api_helpers import execute_and_log
 
 router = APIRouter(
     prefix="/arithmetic",
@@ -10,7 +9,6 @@ router = APIRouter(
 )
 
 # FUNCTION MAPS
-
 BINARY_FUNCTIONS = {
     "add": arithmetic.add,
     "subtract": arithmetic.subtract,
@@ -30,7 +28,6 @@ OTHER_FUNCTIONS = {
 }
 
 # REQUEST MODELS
-
 class BasicArithmeticRequest(BaseModel):
     operation: str
     value1: float
@@ -48,70 +45,38 @@ class OtherArithmeticRequest(BaseModel):
     value1: float
 
 # ROUTES
-
 @router.post("/binary")
 def base_arithmetic_endpoint(request: BasicArithmeticRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+    _, result = execute_and_log(
+        "/arithmetic/binary",
+        request,
         BINARY_FUNCTIONS,
-        "binary"
-    )
-
-    result = safe_execute(
-        func,
+        "binary",
         request.value1,
         request.value2
     )
-
-    state.add_to_history(
-        endpoint="/arithmetic/base",
-        request_data=request.model_dump(),
-        display_name=f"Result of {operation}",
-        output=result
-    )
-
     return {"result": result}
 
 @router.post("/power")
 def power_arithmetic_endpoint(request: PowerArithmeticRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+    _, result = execute_and_log(
+        "/arithmetic/power",
+        request,
         POWER_FUNCTIONS,
-        "power"
-    )
-
-    result = safe_execute(
-        func,
+        "power",
         request.base,
         request.exponent
     )
-
-    state.add_to_history(
-        endpoint="/arithmetic/power",
-        request_data=request.model_dump(),
-        display_name=f"Result of {operation}",
-        output=result
-    )
-
     return {"result": result}
 
 @router.post("/other")
 def other_arithmetic_endpoint(request: OtherArithmeticRequest) -> dict:
-    operation, func = resolve_operation(
-        request.operation,
+    _, result = execute_and_log(
+        "/arithmetic/other",
+        request,
         OTHER_FUNCTIONS,
-        "other"
+        "other",
+        request.value1,
     )
-
-    result = safe_execute(
-        func, request.value1,
-    )
-
-    state.add_to_history(
-        endpoint="/arithmetic/other",
-        request_data=request.model_dump(),
-        display_name=f"Result of {operation}",
-        output=result
-    )
-
     return {"result": result}
+
