@@ -1,6 +1,6 @@
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 
 # Virtual environments
 venv/
@@ -15,3 +15,4 @@ venv/
 # OS junk
 .DS_Store
 Thumbs.db
+
