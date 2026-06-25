@@ -325,7 +325,7 @@ def plot_vectors(vector_list: list, settings: dict):
 
     plt.show()
 
-
+"""
 if __name__ == "__main__": #this is for testing purposes
     test_settings = {
         "linewidth": 2,
@@ -342,7 +342,7 @@ if __name__ == "__main__": #this is for testing purposes
 
 plot_extrema("x^3-3x", "x", test_settings)
 
-
+"""
 
 #Future feature:
 #- optional geometry visualization
