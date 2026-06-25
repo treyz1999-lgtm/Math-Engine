@@ -1,7 +1,7 @@
 import io
 import base64
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def figure_to_base64() -> str:
     """
@@ -77,8 +77,6 @@ def apply_plot_settings(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.grid(settings["plot"]["grid"])
-
-import numpy as np
 
 
 def serialize_plot_data(data):

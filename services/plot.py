@@ -5,6 +5,7 @@ from services.expression_engine import (to_sympy, critical_points, local_extrema
 from services.stats import (to_array, validate_array)
 from utils.plot_helpers import (create_figure, apply_plot_settings, build_plot_response)
 
+
 """
 Plot Response Architecture
 --------------------------
@@ -94,10 +95,12 @@ In short:
     Frontend prefers raw plot data for interactive visualization.
 """
 
-def _build_function_plot(expr: str, variable: str, plot_settings: dict):
+def _build_function_plot(expr: str, variable: str, settings: dict):
     """
     Build a function plot and return computed plot data.
     """
+    plot_settings = settings["plot"]
+
     linewidth = plot_settings["linewidth"]
     color = plot_settings["color"]
     points = plot_settings["points"]
@@ -151,16 +154,16 @@ def _build_function_plot(expr: str, variable: str, plot_settings: dict):
         title=f"f({variable}) = {expr}",
         x_label=variable,
         y_label="f(x)",
-        settings={"plot": plot_settings}
+        settings=settings
     )
 
     return x_values, y_values
 
-def plot_function(expr: str, variable: str, plot_settings: dict):
+def plot_function(expr: str, variable: str, settings: dict):
     x_values, y_values = _build_function_plot(
         expr,
         variable,
-        plot_settings
+        settings
     )
 
     return build_plot_response(
@@ -173,11 +176,11 @@ def plot_function(expr: str, variable: str, plot_settings: dict):
         }
     )
 
-def plot_critical_points(expr: str, variable: str, plot_settings: dict):
+def plot_critical_points(expr: str, variable: str, settings: dict):
     x_values, y_values = _build_function_plot(
         expr,
         variable,
-        plot_settings
+        settings
     )
 
     points = critical_points(expr, variable)
@@ -204,11 +207,11 @@ def plot_critical_points(expr: str, variable: str, plot_settings: dict):
         }
     )
 
-def plot_extrema(expr: str, variable: str, plot_settings: dict):
+def plot_extrema(expr: str, variable: str, settings: dict):
     x_values, y_values = _build_function_plot(
         expr,
         variable,
-        plot_settings
+        settings
     )
 
     extrema = local_extrema(expr, variable)
@@ -242,7 +245,7 @@ def plot_inflections(expr: str, variable: str, settings: dict):
     x_values, y_values = _build_function_plot(
         expr,
         variable,
-        settings["plot"]
+        settings
     )
 
     points = inflection_points(expr, variable, epsilon)
