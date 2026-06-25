@@ -129,3 +129,55 @@ def safe_execute(func, *args):
         return func(*args)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+def serialize_result(result):
+    """
+    Convert non-JSON-friendly results into serializable values.
+
+    FastAPI responses must be JSON serializable. Most basic Python types
+    are already supported by JSON and can be returned unchanged.
+
+    Supported JSON-friendly types include:
+        - int
+        - float
+        - str
+        - bool
+        - list
+        - dict
+
+    Some calculator operations, especially from SymPy, return objects
+    that JSON does not handle well.
+
+    Examples of non-JSON-friendly objects:
+        - SymPy expressions
+        - Interval objects
+        - Symbol objects
+        - Matrix objects
+        - custom classes
+
+    For unsupported result types, this helper converts the object to a
+    string representation so it can be safely returned in API responses
+    and stored in history.
+
+    Example:
+        Input:
+            Interval(0, oo)
+
+        Output:
+            "Interval(0, oo)"
+
+    Args:
+        result:
+            Result returned by a service-layer function.
+
+    Returns:
+        JSON-serializable value:
+            Returns the original result if already JSON-friendly,
+            otherwise returns its string representation.
+    """
+    if result is None:
+        return None
+    if isinstance(result, (int, float, str, bool, list, dict)):
+        return result
+    return str(result)

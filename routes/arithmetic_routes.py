@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-
 import state
 from services import arithmetic
 from utils.api_helpers import resolve_operation, safe_execute
@@ -89,6 +88,27 @@ def power_arithmetic_endpoint(request: PowerArithmeticRequest) -> dict:
 
     state.add_to_history(
         endpoint="/arithmetic/power",
+        request_data=request.model_dump(),
+        display_name=f"Result of {operation}",
+        output=result
+    )
+
+    return {"result": result}
+
+@router.post("/other")
+def other_arithmetic_endpoint(request: OtherArithmeticRequest) -> dict:
+    operation, func = resolve_operation(
+        request.operation,
+        OTHER_FUNCTIONS,
+        "other"
+    )
+
+    result = safe_execute(
+        func, request.value1,
+    )
+
+    state.add_to_history(
+        endpoint="/arithmetic/other",
         request_data=request.model_dump(),
         display_name=f"Result of {operation}",
         output=result
