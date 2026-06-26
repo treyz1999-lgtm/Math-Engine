@@ -420,11 +420,20 @@ const calculatorConfigs = {
     }
 };
 
-const settingsConfig = {
-    endpoint: "/settings/update",
-    fields: [
-        { name: "category", label: "Category", type: "text" },
-        { name: "setting", label: "Setting", type: "text" },
-        { name: "value", label: "Value", type: "text" }
-    ]
+
+const settingsOptions = {
+    general: ["angle_mode", "precision"],
+    plot: [
+        "linewidth",
+        "color",
+        "grid",
+        "points",
+        "x_min",
+        "x_max",
+        "bins",
+        "alpha",
+        "marker",
+        "markersize"
+    ],
+    calculus: ["epsilon"]
 };

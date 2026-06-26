@@ -1,5 +1,9 @@
 import copy
 
+
+# DEFAULT SETTINGS
+
+
 DEFAULT_SETTINGS = {
     "general": {
         "angle_mode": "degrees",
@@ -20,72 +24,26 @@ DEFAULT_SETTINGS = {
     "calculus": {
         "epsilon": 0.1
     }
-} #ideally we will not touch this, and we can just modify a copy for any user changes, this makes resting settings trivial
+}
 
 settings = copy.deepcopy(DEFAULT_SETTINGS)
 history = []
 
+
+
+# HISTORY HELPERS
+
+
+def validate_history_index(index: int):
+    if index < 0 or index >= len(history):
+        raise IndexError("Invalid history index")
+
+
+
 # HISTORY
+
+
 def add_to_history(endpoint: str, request_data: dict, output, display_name: str):
-    """
-       Store a completed calculator API request in history.
-
-       Each history entry contains enough information to both display
-       the calculation in a frontend history panel and replay the exact
-       request later without requiring the user to manually re-enter inputs.
-
-       Stored fields:
-           endpoint:
-               API route used to perform the calculation.
-
-               Example:
-                   "/trig/basic"
-                   "/expressions/calculus/derivative"
-
-               This allows the frontend (or backend) to know which
-               endpoint should be called again when replaying.
-
-           request:
-               Original JSON request payload sent to the endpoint.
-
-               Example:
-                   {
-                       "operation": "sin",
-                       "value": 45
-                   }
-
-               This makes replay simple because the exact request body
-               can be sent again without rebuilding inputs manually.
-
-           display_name:
-               Human-readable label used for frontend history display.
-
-               Example:
-                   "Trig: sin"
-                   "Derivative"
-                   "Law of Cosines: solve_side"
-
-           output:
-               Cached result returned by the original calculation.
-
-               This allows the frontend to immediately show prior results
-               without recomputing unless replay is requested.
-
-       Why store endpoint + request separately?
-           Together, these fields make history replay straightforward.
-
-           A previous calculation can be rerun by retrieving a history entry:
-
-               history[index]["endpoint"]
-               history[index]["request"]
-
-           Then simply sending:
-
-               POST endpoint with request payload
-
-           This design decouples replay logic from calculator menus,
-           allowing users to rerun past calculations directly from history.
-       """
     history.append({
         "endpoint": endpoint,
         "request": request_data,
@@ -103,45 +61,73 @@ def get_history():
 
 
 def get_history_entry(index: int):
-    if index < 0 or index >= len(history):
-        raise IndexError("Invalid history index")
+    validate_history_index(index)
     return history[index]
 
 
 def delete_history_entry(index: int):
-    if index < 0 or index >= len(history):
-        raise IndexError("Invalid history index")
+    validate_history_index(index)
 
     removed = history.pop(index)
     return f"Removed history entry: {removed['display_name']}"
 
+
+def get_replay_payload(index: int):
+    entry = get_history_entry(index)
+
+    return {
+        "endpoint": entry["endpoint"],
+        "request": entry["request"]
+    }
+
+
+
+# VALIDATION HELPERS
+
+
+def validate_positive(value, name):
+    value = float(value)
+    if value <= 0:
+        raise ValueError(f"{name} must be > 0")
+    return value
+
+
+def validate_non_negative(value, name):
+    value = int(value)
+    if value < 0:
+        raise ValueError(f"{name} must be >= 0")
+    return value
+
+
+
 # SETTING VALIDATORS
+
+
 def validate_angle_mode(value):
     if value not in ("degrees", "radians"):
         raise ValueError("angle_mode must be 'degrees' or 'radians'")
     return value
 
+
 def validate_precision(value):
-    value = int(value)
-    if value < 0:
-        raise ValueError("precision must be >= 0")
-    return value
+    return validate_non_negative(value, "precision")
+
 
 def validate_linewidth(value):
-    value = float(value)
-    if value <= 0:
-        raise ValueError("linewidth must be > 0")
-    return value
+    return validate_positive(value, "linewidth")
+
 
 def validate_color(value):
     if not isinstance(value, str):
         raise ValueError("color must be a string")
     return value
 
+
 def validate_grid(value):
     if not isinstance(value, bool):
         raise ValueError("grid must be boolean")
     return value
+
 
 def validate_points(value):
     value = int(value)
@@ -149,11 +135,13 @@ def validate_points(value):
         raise ValueError("points must be at least 2")
     return value
 
+
 def validate_x_min(value):
     value = float(value)
     if value >= settings["plot"]["x_max"]:
         raise ValueError("x_min must be less than x_max")
     return value
+
 
 def validate_x_max(value):
     value = float(value)
@@ -161,11 +149,13 @@ def validate_x_max(value):
         raise ValueError("x_max must be greater than x_min")
     return value
 
+
 def validate_bins(value):
     value = int(value)
     if value < 1:
         raise ValueError("bins must be at least 1")
     return value
+
 
 def validate_alpha(value):
     value = float(value)
@@ -173,22 +163,20 @@ def validate_alpha(value):
         raise ValueError("alpha must be between 0 and 1")
     return value
 
+
 def validate_marker(value):
     if not isinstance(value, str):
         raise ValueError("marker must be a string")
     return value
 
+
 def validate_markersize(value):
-    value = float(value)
-    if value <= 0:
-        raise ValueError("markersize must be > 0")
-    return value
+    return validate_positive(value, "markersize")
+
 
 def validate_epsilon(value):
-    value = float(value)
-    if value <= 0:
-        raise ValueError("epsilon must be > 0")
-    return value
+    return validate_positive(value, "epsilon")
+
 
 SETTING_VALIDATORS = {
     "general": {
@@ -212,12 +200,13 @@ SETTING_VALIDATORS = {
     }
 }
 
+
+
 # SETTINGS
+
+
 def update_settings(category: str, setting: str, value):
-    """
-    Update calculator settings using validator map.
-    """
-    validator = SETTING_VALIDATORS.get(category, {}).get(setting) #validator becomes equal to the function from the map
+    validator = SETTING_VALIDATORS.get(category, {}).get(setting)
 
     if validator is None:
         raise ValueError("Invalid settings category or setting")
@@ -225,6 +214,7 @@ def update_settings(category: str, setting: str, value):
     cleaned_value = validator(value)
     settings[category][setting] = cleaned_value
 
+
 def reset_settings():
     settings.clear()
-    settings.update(copy.deepcopy(DEFAULT_SETTINGS)) #copy keys and values
+    settings.update(copy.deepcopy(DEFAULT_SETTINGS))

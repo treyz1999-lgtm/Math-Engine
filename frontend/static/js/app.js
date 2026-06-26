@@ -128,18 +128,27 @@ function renderCalculator(config) {
 
 function renderSettingsUI() {
     inputArea.innerHTML = `
-        <label>Category:</label>
-        <input id="category" type="text"><br><br>
+        <label for="category">Category:</label>
+        <select id="category"></select>
+        <br><br>
 
-        <label>Setting:</label>
-        <input id="setting" type="text"><br><br>
+        <label for="setting">Setting:</label>
+        <select id="setting"></select>
+        <br><br>
 
-        <label>Value:</label>
-        <input id="value" type="text"><br><br>
+        <label for="value">Value:</label>
+        <input id="value" type="text">
+        <br><br>
 
         <button id="update-settings-btn">Update Setting</button>
         <button id="reset-settings-btn">Reset Settings</button>
     `;
+
+    populateCategoryDropdown();
+
+    document
+        .getElementById("category")
+        .addEventListener("change", populateSettingDropdown);
 
     document
         .getElementById("update-settings-btn")
@@ -148,6 +157,76 @@ function renderSettingsUI() {
     document
         .getElementById("reset-settings-btn")
         .addEventListener("click", resetSettings);
+}
+
+function populateCategoryDropdown() {
+    const categorySelect = document.getElementById("category");
+    categorySelect.innerHTML = "";
+
+    for (const category in settingsOptions) {
+        categorySelect.innerHTML += `
+            <option value="${category}">
+                ${category}
+            </option>
+        `;
+    }
+
+    populateSettingDropdown();
+}
+
+function populateSettingDropdown() {
+    const category =
+        document.getElementById("category").value;
+
+    const settingSelect =
+        document.getElementById("setting");
+
+    settingSelect.innerHTML = "";
+
+    for (const setting of settingsOptions[category]) {
+        settingSelect.innerHTML += `
+            <option value="${setting}">
+                ${setting}
+            </option>
+        `;
+    }
+}
+
+async function renderHistoryUI() {
+    try {
+        plotDisplay.innerHTML = "";
+        resultDisplay.textContent = "";
+
+        const response = await fetch(`${BASE_URL}/history/summary`);
+        const data = await response.json();
+
+        let html = `<h3>History</h3><br>`;
+
+        if (data.history.length === 0) {
+            html += `<p>No history yet.</p>`;
+        }
+
+        for (const entry of data.history) {
+            html += `
+                <div class="history-entry">
+                    <strong>${entry.display_name}</strong>
+                    <br><br>
+                    <button onclick="replayHistory(${entry.index})">
+                        Replay
+                    </button>
+                    <button onclick="deleteHistory(${entry.index})">
+                        Delete
+                    </button>
+                    <br><br>
+                </div>
+            `;
+        }
+
+        inputArea.innerHTML = html;
+    }
+    catch (error) {
+        resultDisplay.textContent = error.message;
+    }
 }
 
 
@@ -202,6 +281,55 @@ async function resetSettings() {
 
 
 // =========================
+// HISTORY
+// =========================
+
+async function replayHistory(index) {
+    try {
+        const replayData = await callAPI(
+            `/history/replay/${index}`,
+            {}
+        );
+
+        const result = await callAPI(
+            replayData.endpoint,
+            replayData.request
+        );
+
+        if (result.result?.plot_type) {
+            resultDisplay.textContent = "Plot generated.";
+            renderPlot(result.result, plotDisplay);
+        }
+        else {
+            plotDisplay.innerHTML = "";
+            resultDisplay.textContent =
+                renderResult(result.result);
+        }
+    }
+    catch (error) {
+        resultDisplay.textContent = error.message;
+    }
+}
+
+async function deleteHistory(index) {
+    try {
+        const response = await fetch(`${BASE_URL}/history/${index}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to delete history entry");
+        }
+
+        renderHistoryUI();
+    }
+    catch (error) {
+        resultDisplay.textContent = error.message;
+    }
+}
+
+
+// =========================
 // RUN BUTTON
 // =========================
 
@@ -248,5 +376,9 @@ registerSidebarButton("plot-btn", "plot", "function");
 document
     .getElementById("settings-btn")
     ?.addEventListener("click", renderSettingsUI);
+
+document
+    .getElementById("history-btn")
+    ?.addEventListener("click", renderHistoryUI);
 
 renderCalculator(calculatorConfigs.arithmetic.binary);
