@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Math Engine</title>
+
     <link rel="stylesheet" href="../static/css/styles.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
         <h2>Math Engine</h2>
 
         <nav>
-            <button>Arithmetic</button>
-            <button>Trigonometry</button>
-            <button>Expressions</button>
-            <button>Statistics</button>
-            <button>Geometry 2D</button>
-            <button>Geometry 3D</button>
-            <button>Linear Algebra</button>
-            <button>Plotting</button>
-            <button>History</button>
-            <button>Settings</button>
+            <button id="arithmetic-btn">Arithmetic</button>
+            <button id="trig-btn">Trigonometry</button>
+            <button id="expressions-btn">Expressions</button>
+            <button id="stats-btn">Statistics</button>
+            <button id="geometry2d-btn">Geometry 2D</button>
+            <button id="geometry3d-btn">Geometry 3D</button>
+            <button id="linear-btn">Linear Algebra</button>
+            <button id="plot-btn">Plotting</button>
+            <button id="history-btn">History</button>
+            <button id="settings-btn">Settings</button>
         </nav>
     </aside>
 
-    <!-- TOP RIGHT: OUTPUT / GRAPH AREA -->
     <section class="output-panel">
         <h2>Output</h2>
 
@@ -40,22 +40,19 @@
         </div>
     </section>
 
-    <!-- BOTTOM RIGHT: INPUT AREA -->
     <section class="input-panel">
         <h2>Input</h2>
 
-        <div id="input-area">
-
-            <label for="test-input">Test Input:</label>
-            <input id="test-input" type="text" placeholder="Type something...">
-
-        </div>
+        <div id="input-area"></div>
 
         <button id="run-btn">Run</button>
     </section>
 
 </div>
 
+<script src="../static/js/config.js"></script>
+<script src="../static/js/api.js"></script>
 <script src="../static/js/app.js"></script>
+
 </body>
 </html>
