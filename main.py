@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routes import history_routes
 # ROUTERS
 from routes.arithmetic_routes import router as arithmetic_router
 from routes.trig_routes import router as trig_router
@@ -11,6 +12,7 @@ from routes.geometry_3d_routes import router as geometry_3d_router
 from routes.stats_routes import router as stats_router
 from routes.linear_routes import router as linear_router
 from routes.plot_routes import router as plot_router
+from routes.history_routes import router as history_router
 
 app = FastAPI(
     title="Calculator API",
@@ -45,3 +47,5 @@ app.include_router(geometry_3d_router)
 app.include_router(stats_router)
 app.include_router(linear_router)
 app.include_router(plot_router)
+
+app.include_router(history_router)

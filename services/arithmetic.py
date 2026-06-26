@@ -35,7 +35,7 @@ def absolute_value(x : float) -> float:
     return abs(x)
 
 
-def factorial(n : float) -> float:
+def factorial(n : int) -> int:
     if n < 0:
         raise ValueError('Factorial is not defined for negative numbers')
     return math.factorial(n)

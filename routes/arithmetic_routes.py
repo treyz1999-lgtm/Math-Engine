@@ -42,7 +42,7 @@ class PowerArithmeticRequest(BaseModel):
 
 class OtherArithmeticRequest(BaseModel):
     operation: str
-    value1: float
+    value1: float | int
 
 # ROUTES
 @router.post("/binary")
