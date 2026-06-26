@@ -164,6 +164,41 @@ const calculatorConfigs = {
                 { name: "variable", label: "Variable", type: "text" },
                 { name: "value", label: "Approach Value", type: "text" }
             ]
+        },
+
+        domain: {
+            endpoint: "/expressions/function/domain",
+            operations: ["domain"],
+            fields: [
+                { name: "expr", label: "Expression", type: "text" },
+                { name: "variable", label: "Variable", type: "text" }
+            ]
+        },
+
+        intercepts: {
+            endpoint: "/expressions/function/intercepts",
+            operations: ["intercepts"],
+            fields: [
+                { name: "expr", label: "Expression", type: "text" }
+            ]
+        },
+
+        criticalPoints: {
+            endpoint: "/expressions/function/critical-points",
+            operations: ["critical_points", "local_extrema"],
+            fields: [
+                { name: "expr", label: "Expression", type: "text" },
+                { name: "variable", label: "Variable", type: "text" }
+            ]
+        },
+
+        inflectionPoints: {
+            endpoint: "/expressions/function/inflection-points",
+            operations: ["inflection_points"],
+            fields: [
+                { name: "expr", label: "Expression", type: "text" },
+                { name: "variable", label: "Variable", type: "text" }
+            ]
         }
     },
         stats: {
@@ -216,7 +251,13 @@ const calculatorConfigs = {
     geometry2d: {
         singleInput: {
             endpoint: "/geometry-2d/single-input",
-            operations: ["square_area", "square_perimeter", "square_diagonal", "circle_area", "circle_circumference"],
+            operations: [
+                "square_area",
+                "square_perimeter",
+                "square_diagonal",
+                "circle_area",
+                "circle_circumference"
+            ],
             fields: [
                 { name: "value", label: "Value", type: "number" }
             ]
@@ -241,7 +282,11 @@ const calculatorConfigs = {
 
         threeInput: {
             endpoint: "/geometry-2d/three-input",
-            operations: ["triangle_area_sss", "triangle_perimeter", "trapezoid_area"],
+            operations: [
+                "triangle_area_sss",
+                "triangle_perimeter",
+                "trapezoid_area"
+            ],
             fields: [
                 { name: "value1", label: "Value 1", type: "number" },
                 { name: "value2", label: "Value 2", type: "number" },
@@ -278,7 +323,13 @@ const calculatorConfigs = {
     geometry3d: {
         singleInput: {
             endpoint: "/geometry-3d/single-input",
-            operations: ["cube_volume", "cube_surface_area", "cube_edge_sum", "sphere_volume", "sphere_surface_area"],
+            operations: [
+                "cube_volume",
+                "cube_surface_area",
+                "cube_edge_sum",
+                "sphere_volume",
+                "sphere_surface_area"
+            ],
             fields: [
                 { name: "value", label: "Value", type: "number" }
             ]
@@ -302,7 +353,11 @@ const calculatorConfigs = {
 
         threeInput: {
             endpoint: "/geometry-3d/three-input",
-            operations: ["prism_volume", "prism_surface_area", "prism_diagonal"],
+            operations: [
+                "prism_volume",
+                "prism_surface_area",
+                "prism_diagonal"
+            ],
             fields: [
                 { name: "value1", label: "Value 1", type: "number" },
                 { name: "value2", label: "Value 2", type: "number" },
@@ -310,11 +365,15 @@ const calculatorConfigs = {
             ]
         }
     },
-
-    linear: {
+        linear: {
         vectorPair: {
             endpoint: "/linear/vector-pair",
-            operations: ["vector_add", "vector_subtract", "vector_dot_product", "vector_cross_product"],
+            operations: [
+                "vector_add",
+                "vector_subtract",
+                "vector_dot_product",
+                "vector_cross_product"
+            ],
             fields: [
                 { name: "vector_1", label: "Vector 1", type: "array" },
                 { name: "vector_2", label: "Vector 2", type: "array" }
@@ -323,7 +382,10 @@ const calculatorConfigs = {
 
         vectorSingle: {
             endpoint: "/linear/vector-single",
-            operations: ["vector_magnitude", "vector_unit"],
+            operations: [
+                "vector_magnitude",
+                "vector_unit"
+            ],
             fields: [
                 { name: "vector", label: "Vector", type: "array" }
             ]
@@ -331,7 +393,9 @@ const calculatorConfigs = {
 
         vectorScalar: {
             endpoint: "/linear/vector-scalar",
-            operations: ["vector_scalar_multiply"],
+            operations: [
+                "vector_scalar_multiply"
+            ],
             fields: [
                 { name: "vector", label: "Vector", type: "array" },
                 { name: "scalar", label: "Scalar", type: "number" }
@@ -340,7 +404,11 @@ const calculatorConfigs = {
 
         matrixPair: {
             endpoint: "/linear/matrix-pair",
-            operations: ["matrix_add", "matrix_subtract", "matrix_multiply"],
+            operations: [
+                "matrix_add",
+                "matrix_subtract",
+                "matrix_multiply"
+            ],
             fields: [
                 { name: "matrix_1", label: "Matrix 1", type: "matrix" },
                 { name: "matrix_2", label: "Matrix 2", type: "matrix" }
@@ -366,7 +434,9 @@ const calculatorConfigs = {
 
         matrixScalar: {
             endpoint: "/linear/matrix-scalar",
-            operations: ["matrix_scalar_multiply"],
+            operations: [
+                "matrix_scalar_multiply"
+            ],
             fields: [
                 { name: "matrix", label: "Matrix", type: "matrix" },
                 { name: "scalar", label: "Scalar", type: "number" }
@@ -375,10 +445,20 @@ const calculatorConfigs = {
 
         solveSystem: {
             endpoint: "/linear/solve-system",
-            operations: ["solve_linear_system"],
+            operations: [
+                "solve_linear_system"
+            ],
             fields: [
-                { name: "coefficient_matrix", label: "Coefficient Matrix", type: "matrix" },
-                { name: "constant_vector", label: "Constant Vector", type: "array" }
+                {
+                    name: "coefficient_matrix",
+                    label: "Coefficient Matrix",
+                    type: "matrix"
+                },
+                {
+                    name: "constant_vector",
+                    label: "Constant Vector",
+                    type: "array"
+                }
             ]
         }
     },
@@ -386,7 +466,12 @@ const calculatorConfigs = {
     plot: {
         function: {
             endpoint: "/plot/function",
-            operations: ["function", "critical_points", "extrema", "inflections"],
+            operations: [
+                "function",
+                "critical_points",
+                "extrema",
+                "inflections"
+            ],
             fields: [
                 { name: "expr", label: "Expression", type: "text" },
                 { name: "variable", label: "Variable", type: "text" }
@@ -395,7 +480,10 @@ const calculatorConfigs = {
 
         dataset: {
             endpoint: "/plot/dataset",
-            operations: ["histogram", "boxplot"],
+            operations: [
+                "histogram",
+                "boxplot"
+            ],
             fields: [
                 { name: "data", label: "Dataset", type: "array" }
             ]
@@ -403,7 +491,9 @@ const calculatorConfigs = {
 
         scatter: {
             endpoint: "/plot/scatter",
-            operations: ["scatter"],
+            operations: [
+                "scatter"
+            ],
             fields: [
                 { name: "x_data", label: "X Data", type: "array" },
                 { name: "y_data", label: "Y Data", type: "array" }
@@ -412,7 +502,9 @@ const calculatorConfigs = {
 
         vectors: {
             endpoint: "/plot/vectors",
-            operations: ["vectors"],
+            operations: [
+                "vectors"
+            ],
             fields: [
                 { name: "vector_list", label: "Vectors", type: "matrix" }
             ]
@@ -421,8 +513,16 @@ const calculatorConfigs = {
 };
 
 
+// =========================
+// SETTINGS OPTIONS
+// =========================
+
 const settingsOptions = {
-    general: ["angle_mode", "precision"],
+    general: [
+        "angle_mode",
+        "precision"
+    ],
+
     plot: [
         "linewidth",
         "color",
@@ -435,5 +535,8 @@ const settingsOptions = {
         "marker",
         "markersize"
     ],
-    calculus: ["epsilon"]
+
+    calculus: [
+        "epsilon"
+    ]
 };

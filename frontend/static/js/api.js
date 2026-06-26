@@ -1,23 +1,36 @@
-// =========================
+
 // PARSERS
-// =========================
+
 
 function parseArray(input) {
-    return input
+    const arr = input
         .split(",")
-        .map(value => Number(value.trim()))
-        .filter(value => !isNaN(value));
+        .map(value => Number(value.trim()));
+
+    if (arr.length === 0 || arr.some(value => isNaN(value))) {
+        throw new Error("Invalid array input");
+    }
+
+    return arr;
 }
 
 function parseMatrix(input) {
-    return input
+    const matrix = input
         .trim()
         .split("\n")
         .map(row =>
-            row
-                .split(",")
-                .map(value => Number(value.trim()))
+            row.split(",").map(value => {
+                const num = Number(value.trim());
+
+                if (isNaN(num)) {
+                    throw new Error("Invalid matrix input");
+                }
+
+                return num;
+            })
         );
+
+    return matrix;
 }
 
 function parseTextArray(input) {
@@ -28,9 +41,9 @@ function parseTextArray(input) {
 }
 
 
-// =========================
+
 // INPUT PARSER DISPATCH
-// =========================
+
 
 function parseInputByType(field, inputElement) {
     if (!inputElement) {
@@ -78,23 +91,37 @@ function parseInputByType(field, inputElement) {
 }
 
 
-// =========================
-// API HELPERS
-// =========================
 
-async function callAPI(endpoint, payload) {
-    const response = await fetch(BASE_URL + endpoint, {
-        method: "POST",
+// API HELPERS
+
+
+async function callAPI(endpoint, payload = null, method = "POST") {
+    const options = {
+        method,
         headers: {
             "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
+        }
+    };
 
-    const data = await response.json();
+    if (payload !== null && method !== "GET") {
+        options.body = JSON.stringify(payload);
+    }
+
+    const response = await fetch(BASE_URL + endpoint, options);
+
+    const contentType = response.headers.get("content-type");
+    let data = null;
+
+    if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+    }
 
     if (!response.ok) {
-        throw new Error(data.detail || "API request failed");
+        throw new Error(
+            data?.detail ||
+            data?.message ||
+            "API request failed"
+        );
     }
 
     return data;
@@ -122,9 +149,9 @@ function buildPayload(config) {
 }
 
 
-// =========================
+
 // RESULT RENDERERS
-// =========================
+
 
 function renderResult(result) {
     if (result === null || result === undefined) {
@@ -161,9 +188,9 @@ function renderResult(result) {
 }
 
 
-// =========================
+
 // PLOT HELPERS
-// =========================
+
 
 function renderFallbackImage(plotDisplay, png) {
     if (!png) return;
@@ -225,9 +252,9 @@ function renderLinePlot(plotDisplay, plotData) {
 }
 
 
-// =========================
+
 // PLOT RENDERER
-// =========================
+
 
 function renderPlot(plotResponse, plotDisplay) {
     plotDisplay.innerHTML = "";
@@ -268,6 +295,20 @@ function renderPlot(plotResponse, plotDisplay) {
                 }],
                 {
                     title: "Histogram"
+                }
+            );
+            return;
+        }
+
+        if (plotType === "boxplot") {
+            Plotly.newPlot(
+                plotDisplay,
+                [{
+                    y: plotData.data,
+                    type: "box"
+                }],
+                {
+                    title: "Box Plot"
                 }
             );
             return;

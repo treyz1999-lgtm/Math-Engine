@@ -14,6 +14,7 @@ const runButton = document.getElementById("run-btn");
 
 let activeCategory = "arithmetic";
 let activeCalculator = calculatorConfigs.arithmetic.binary;
+let uiMode = "calculator";
 
 
 // =========================
@@ -86,6 +87,7 @@ function renderField(field) {
 // =========================
 
 function renderCalculator(config) {
+    uiMode = "calculator";
     activeCalculator = config;
 
     let html = "";
@@ -127,6 +129,8 @@ function renderCalculator(config) {
 }
 
 function renderSettingsUI() {
+    uiMode = "settings";
+
     inputArea.innerHTML = `
         <label for="category">Category:</label>
         <select id="category"></select>
@@ -194,11 +198,15 @@ function populateSettingDropdown() {
 
 async function renderHistoryUI() {
     try {
+        uiMode = "history";
         plotDisplay.innerHTML = "";
         resultDisplay.textContent = "";
 
-        const response = await fetch(`${BASE_URL}/history/summary`);
-        const data = await response.json();
+        const data = await callAPI(
+            "/history/summary",
+            null,
+            "GET"
+        );
 
         let html = `<h3>History</h3><br>`;
 
@@ -253,12 +261,25 @@ function registerSidebarButton(buttonId, categoryName, defaultSubcategory) {
 // SETTINGS
 // =========================
 
+function parseSettingValue(value) {
+    if (value === "true") return true;
+    if (value === "false") return false;
+
+    if (!isNaN(Number(value)) && value.trim() !== "") {
+        return Number(value);
+    }
+
+    return value;
+}
+
 async function updateSettings() {
     try {
         const payload = {
             category: document.getElementById("category").value,
             setting: document.getElementById("setting").value,
-            value: document.getElementById("value").value
+            value: parseSettingValue(
+                document.getElementById("value").value
+            )
         };
 
         const data = await callAPI("/settings/update", payload);
@@ -313,13 +334,11 @@ async function replayHistory(index) {
 
 async function deleteHistory(index) {
     try {
-        const response = await fetch(`${BASE_URL}/history/${index}`, {
-            method: "DELETE"
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to delete history entry");
-        }
+        await callAPI(
+            `/history/${index}`,
+            null,
+            "DELETE"
+        );
 
         renderHistoryUI();
     }
@@ -335,6 +354,12 @@ async function deleteHistory(index) {
 
 runButton.addEventListener("click", async function () {
     try {
+        if (uiMode !== "calculator") {
+            resultDisplay.textContent =
+                "Run is only available in calculator mode.";
+            return;
+        }
+
         resultDisplay.textContent = "Computing...";
         plotDisplay.innerHTML = "";
 
