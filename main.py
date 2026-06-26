@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # ROUTERS
 from routes.arithmetic_routes import router as arithmetic_router
@@ -14,6 +15,14 @@ from routes.plot_routes import router as plot_router
 app = FastAPI(
     title="Calculator API",
     version="1.1"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # allow all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")

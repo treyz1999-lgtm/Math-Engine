@@ -1,0 +1,43 @@
+/* Remove default browser spacing */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Entire application window */
+.app-container {
+    display: grid;
+
+    /* 2 columns:
+       - left sidebar fixed width
+       - right side fills remaining space
+    */
+    grid-template-columns: 250px 1fr;
+
+    /* 2 rows:
+       - output area larger
+       - input area smaller
+    */
+    grid-template-rows: 2fr 1fr;
+
+    height: 100vh;
+}
+
+/* Sidebar spans full height */
+.sidebar {
+    grid-row: 1 / 3;
+
+    border-right: 2px solid black;
+    padding: 20px;
+}
+
+/* Top right section */
+.output-panel {
+    border-bottom: 2px solid black;
+    padding: 20px;
+}
+
+/* Bottom right section */
+.input-panel {
+    padding: 20px;
+}
