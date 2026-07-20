@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from routes import history_routes
 # ROUTERS
@@ -27,15 +29,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+
 @app.get("/")
 def root():
-    return {
-        "message": (
-            "'I'm Your Huckleberry...' "
-            "I haven't even seen Tombstone but Doc Holiday had aura in that clip. "
-            "A job would be cool too."
-        )
-    }
+    return FileResponse("frontend/templates/index.html")
 
 # REGISTER ROUTERS
 app.include_router(arithmetic_router)
