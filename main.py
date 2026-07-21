@@ -1,9 +1,10 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from routes import history_routes
 # ROUTERS
 from routes.arithmetic_routes import router as arithmetic_router
 from routes.trig_routes import router as trig_router
@@ -29,11 +30,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+FRONTEND_DIST = Path("frontend/dist")
+FRONTEND_ASSETS = FRONTEND_DIST / "assets"
+
+if FRONTEND_ASSETS.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS), name="assets")
 
 @app.get("/")
 def root():
-    return FileResponse("frontend/templates/index.html")
+    return FileResponse(FRONTEND_DIST / "index.html")
 
 # REGISTER ROUTERS
 app.include_router(arithmetic_router)

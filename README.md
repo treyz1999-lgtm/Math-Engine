@@ -1,6 +1,6 @@
 # Math Engine
 
-A full-stack mathematical computation engine built with **FastAPI**, **Python**, and **vanilla JavaScript** that supports advanced mathematical operations including arithmetic, trigonometry, symbolic algebra, calculus, statistics, geometry, linear algebra, and interactive plotting.
+A full-stack mathematical computation engine built with **FastAPI**, **Python**, and **React** that supports advanced mathematical operations including arithmetic, trigonometry, symbolic algebra, calculus, statistics, geometry, linear algebra, and interactive plotting.
 
 This project was designed to mimic the architecture of a production-style software system rather than a simple calculator. It features a modular backend, dynamic frontend rendering, configurable settings, plotting support, and request history replay.
 
@@ -66,6 +66,22 @@ Examples:
 
 ```math
 x^2 - 5x + 6 = 0
+```
+
+Current React frontend structure:
+
+```text
+frontend/
+|-- package.json
+|-- index.html
+|-- src/
+|   |-- App.jsx
+|   |-- components/
+|   |-- features/
+|   |-- services/
+|   |-- utils/
+|   `-- styles/
+`-- legacy/vanilla/
 ```
 
 ---
@@ -202,9 +218,9 @@ Supports:
 - Pydantic
 
 ## Frontend
-- HTML
+- React
+- Vite
 - CSS
-- Vanilla JavaScript
 - Plotly.js
 
 ---
@@ -290,13 +306,14 @@ Supports:
 
 # Frontend Design
 
-The frontend behaves like a lightweight single-page application.
+The frontend is a React single-page application built with Vite.
 
 Core concepts:
 - dynamic form rendering
-- event-driven architecture
+- component-based architecture
 - client-server communication
 - centralized configuration
+- centralized API service layer
 
 ---
 
@@ -426,13 +443,52 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run server:
+Install frontend dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+Create a frontend environment file:
+
+```bash
+copy .env.example .env
+```
+
+For local development, keep:
+
+```text
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+Run the FastAPI backend from the project root:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Open browser:
+Run the React frontend in another terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Open the Vite app:
+
+```text
+http://127.0.0.1:5173
+```
+
+Build the React frontend for FastAPI to serve:
+
+```bash
+cd frontend
+npm run build
+```
+
+Then open the FastAPI-served production build:
 
 ```text
 http://127.0.0.1:8000
@@ -444,7 +500,6 @@ http://127.0.0.1:8000
 
 Potential enhancements:
 
-- React frontend
 - Dark mode
 - User authentication
 - Save history to database

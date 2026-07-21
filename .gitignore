@@ -12,6 +12,10 @@ venv/
 # Environment files
 .env
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
 # OS junk
 .DS_Store
 Thumbs.db
